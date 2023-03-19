@@ -1,0 +1,28 @@
+!Puzzle
+  name: 3x4-5p-1
+  description: 答えが非常に多い
+  shape: |
+    oooo
+    o_oo
+    o_oo
+  puzzle_pieces:
+    - !Polyomino
+      name: "1"
+      shape: |
+        oo
+    - !Polyomino
+      name: "2"
+      shape: |
+        oo
+    - !Polyomino
+      name: "3"
+      shape: |
+        oo
+    - !Polyomino
+      name: "4"
+      shape: |
+        oo
+    - !Polyomino
+      name: "5"
+      shape: |
+        oo

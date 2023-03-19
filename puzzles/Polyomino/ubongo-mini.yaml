@@ -1,0 +1,50 @@
+!Puzzle
+  name: ubongo-mini
+  description: |
+    ウボンゴ ミニ
+  fill_value: "       "
+  shape: |
+    __oo
+    _oooo
+    ooooo
+    ooo
+  puzzle_pieces:
+    - !Polyomino
+      name: "yellow "
+      shape: |
+        ooo
+    - !Polyomino
+      name: "navy   "
+      shape: |
+        ooo
+        o
+    - !Polyomino
+      name: "emerald"
+      shape: |
+        ooo
+        _o
+    - !Polyomino
+      name: "red    "
+      shape: |
+        oo
+        _oo
+    - !Polyomino
+      name: "ocean  "
+      shape: |
+        oooo
+        o
+    - !Polyomino
+      name: "lime   "
+      shape: |
+        oooo
+        _o
+    - !Polyomino
+      name: "blue   "
+      shape: |
+        ooo
+        __oo
+    - !Polyomino
+      name: "orange "
+      shape: |
+        ooo
+        oo

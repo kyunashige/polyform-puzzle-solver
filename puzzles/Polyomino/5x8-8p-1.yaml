@@ -1,0 +1,54 @@
+!Puzzle
+  name: 5x8-8p-1
+  description: |
+    「明治ホワイトチョコレートパズル スイート（とける甘さ）」
+  fill_value: "     "
+  shape: |
+    oooooooo
+    oooooooo
+    oooooooo
+    oooooooo
+    oooooooo
+  puzzle_pieces:
+    - !Polyomino
+      name: "purple"
+      shape: |
+        oo
+        o
+    - !Polyomino
+      name: "red   "
+      shape: |
+        ooo
+        o
+    - !Polyomino
+      name: "pink  "
+      shape: |
+        ooo
+        oo
+    - !Polyomino
+      name: "yellow"
+      shape: |
+        oooo
+        o
+    - !Polyomino
+      name: "blue  "
+      shape: |
+        ooooo
+        o
+    - !Polyomino
+      name: "black "
+      shape: |
+        ooo
+        o
+        o
+    - !Polyomino
+      name: "orange"
+      shape: |
+        oooo
+        oo
+    - !Polyomino
+      name: "green "
+      shape: |
+        oooo
+        o
+        o

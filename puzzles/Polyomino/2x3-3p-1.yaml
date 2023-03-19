@@ -1,0 +1,19 @@
+!Puzzle
+  name: 2x3-3p-1
+  description: 使わないピースがある：使わないピースが1つ
+  shape: |
+    ooo
+    o
+  puzzle_pieces:
+    - !Polyomino
+      name: "1"
+      shape: |
+        oo
+    - !Polyomino
+      name: "2"
+      shape: |
+        oo
+    - !Polyomino
+      name: "3"
+      shape: |
+        oo

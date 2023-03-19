@@ -1,0 +1,18 @@
+!Puzzle
+  name: 3x4-2p-2
+  description: 左上が空であるようなピースを使う
+  shape: |
+    _ooo
+    ooo
+    _o
+  puzzle_pieces:
+    - !Polyomino
+      name: "+"
+      shape: |
+        _o
+        ooo
+        _o
+    - !Polyomino
+      name: "-"
+      shape: |
+        oo

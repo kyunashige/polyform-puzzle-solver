@@ -1,0 +1,52 @@
+!Puzzle
+  name: 4x8-8p-1
+  description: 5x8-8p-1 の半分
+  fill_value: "      "
+  shape: |
+    oooooooo
+    oooooo
+    oooo
+    oo
+  puzzle_pieces:
+    - !Polyomino
+      name: "purple"
+      shape: |
+        oo
+        o
+    - !Polyomino
+      name: "red   "
+      shape: |
+        ooo
+        o
+    - !Polyomino
+      name: "pink  "
+      shape: |
+        ooo
+        oo
+    - !Polyomino
+      name: "yellow"
+      shape: |
+        oooo
+        o
+    - !Polyomino
+      name: "blue  "
+      shape: |
+        ooooo
+        o
+    - !Polyomino
+      name: "black "
+      shape: |
+        ooo
+        o
+        o
+    - !Polyomino
+      name: "orange"
+      shape: |
+        oooo
+        oo
+    - !Polyomino
+      name: "green "
+      shape: |
+        oooo
+        o
+        o

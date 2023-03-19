@@ -1,0 +1,20 @@
+!Puzzle
+  name: 3x4-2p-1
+  description: flip により答えの数が変わる
+  shape: |
+    oooo
+    o_oo
+    oooo
+  puzzle_pieces:
+    - !Polyomino
+      name: "1"
+      shape: |
+        oooo
+        o___
+      flip: True
+    - !Polyomino
+      name: "2"
+      shape: |
+        oooo
+        __oo
+      flip: True
