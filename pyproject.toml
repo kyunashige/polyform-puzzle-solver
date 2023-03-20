@@ -1,7 +1,7 @@
 [tool.poetry]
 name = "polyform-puzzle-solver"
 version = "0.0.0"  # using poetry-dynamic-versioning
-description = "Solve Polyform Puzzle"
+description = "A polyform puzzle solver"
 authors = ["kyunashige <kyuna.b23@gmail.com>"]
 readme = "README.md"
 packages = [{include = "polyform_puzzle_solver"}]
@@ -14,6 +14,7 @@ tqdm = "^4.65.0"
 
 [tool.poetry-dynamic-versioning]
 enable = true
+format = "{base}"
 
 [build-system]
 requires = ["poetry-core"]
