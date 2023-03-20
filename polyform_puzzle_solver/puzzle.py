@@ -168,7 +168,7 @@ class Puzzle(yaml.YAMLObject):
             pos_list = ((Position(*p) + offset) for p in zip(*candidate.nonzero()))
             coords_list = zip(*map(self.grid.pos2coords, pos_list))
             array[tuple(coords_list)] = piece.name
-        return np.array2string(array, separator="", formatter={"all": lambda x: str(x)})
+        return np.array2string(array, separator=" ", formatter={"all": lambda x: str(x)})
 
     def visualize_all_solutions(self):
         return {i: self.visualize_solution(i) for i, _ in enumerate(self.solutions)}

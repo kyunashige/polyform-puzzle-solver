@@ -10,9 +10,9 @@ np.set_printoptions(edgeitems=30, linewidth=10**5, formatter=dict(float=lambda x
 def main(puzzle_name, **options):
     with solve_puzzle(f"puzzles/{puzzle_name}.yaml", **options) as puzzle:
         print("-" * 20)
-        print(f"Puzzle Name: {puzzle.name}")
+        print(f"=== Puzzle Name: {puzzle.name} ===")
         print(puzzle.grid.to_text())
-        print(f"Puzzle Pieces: {len(puzzle.puzzle_pieces)} pieces")
+        print(f"=== Puzzle Pieces ({len(puzzle.puzzle_pieces)} pieces) ===")
         for piece in puzzle.puzzle_pieces:
             print(f"Name: {repr(piece.name)} (#candidates={len(piece.candidates)})")
             print(piece.grid.to_text())
