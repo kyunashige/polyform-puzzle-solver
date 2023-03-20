@@ -12,6 +12,9 @@ pyyaml = "^6.0"
 numpy = "^1.24.2"
 tqdm = "^4.65.0"
 
+[tool.poetry-dynamic-versioning]
+enable = true
+style = "pep440"
 
 [build-system]
 requires = ["poetry-core"]

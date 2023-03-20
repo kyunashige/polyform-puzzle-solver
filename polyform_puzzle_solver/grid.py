@@ -27,7 +27,11 @@ class Position:
         return Position(*map(abs, self))
 
     def __add__(self, other):
-        return Position(*(a + b for a, b in zip(self, other)))
+        if isinstance(other, Position):
+            return Position(*(a + b for a, b in zip(self, other)))
+        if isinstance(other, int):
+            return Position(*(a + other for a in self))
+        raise TypeError
 
     def __iadd__(self, other):
         self.coords = (self + other).coords
@@ -66,9 +70,6 @@ class Limit:
         self.min = min(self.min, value)
         self.max = max(self.max, value)
 
-    def __len__(self):
-        return self.max - self.min + 1
-
     def __getitem__(self, key):
         if key == 0:
             return self.min
@@ -77,14 +78,36 @@ class Limit:
         raise IndexError
 
 
+class Limits:
+    def __init__(self, dim):
+        self.dim = dim
+        self.limits = tuple(Limit() for _ in range(self.dim))
+
+    def __repr__(self):
+        return repr(self.limits)
+
+    def update(self, position):
+        for i, pi in enumerate(position):
+            self.limits[i].update(pi)
+
+    @property
+    def min(self):
+        return Position(*(limit.min for limit in self.limits))
+
+    @property
+    def max(self):
+        return Position(*(limit.max for limit in self.limits))
+
+
 class Grid:
     dim = 2
     empty = "_"
+    __heritable__ = ()
 
     def __init__(self):
         self.sparse = {}
         self.adjacents = tuple(self.gen_adjacents())
-        self.limits = [Limit() for _ in range(self.dim)]
+        self.limits = Limits(self.dim)
 
     def __repr__(self):
         return "%s(text=(\n%s), limits=%s)" % (
@@ -99,32 +122,34 @@ class Grid:
     def __eq__(self, other):
         return hash(self) == hash(other)
 
-    def __getitem__(self, key, default=None):
+    def __getitem__(self, key, default=empty):
         return self.sparse.get(key, default)
 
     def __setitem__(self, key, value):
-        for i, coord in enumerate(key):
-            self.limits[i].update(coord)
+        self.limits.update(key)
         self.sparse[key] = value
 
-    def __call__(self, fn):
-        transformed = self.__class__()
+    def __call__(self, fn, **kwargs):
+        for attr in self.__heritable__:
+            if attr not in kwargs:
+                kwargs[attr] = getattr(self, attr)
+        transformed = self.__class__(**kwargs)
         for position, value in self.sparse.items():
             transformed[fn(position)] = value
         assert transformed.area() == self.area()
         return transformed
 
-    def translate(self, add):
-        return self(lambda p: Position(*(i + di for i, di in zip(p, add))))
-
-    def normalize(self):
-        return self.translate([-l.min for l in self.limits])
-
     def area(self):
         return len(self.sparse)
 
     def size(self):
-        return tuple(map(len, self.limits))
+        return self.limits.max + 1
+
+    def size_of_coords(self):
+        limits = Limits(self.dim)
+        for position in self.sparse.keys():
+            limits.update(self.pos2coords(position))
+        return limits
 
     def to_numpy(self):
         state = np.zeros(self.size(), dtype=np.int8)
@@ -148,45 +173,94 @@ class Grid:
             if self.distance(dij) == 1:
                 yield dij
 
-    def from_text(self, text):
+    def coords2pos(self, *coords):
         raise NotImplementedError
 
-    def to_text(self):
+    def pos2coords(self, position):
         raise NotImplementedError
+
+    def from_text(self, text):
+        for ci, row in enumerate(text.splitlines()):
+            for cj, char in enumerate(row):
+                if char == self.empty:
+                    continue
+                self[self.coords2pos(ci, cj)] = char
+        return self
+
+    def to_text(self):
+        array = np.full(self.size_of_coords().max + 1, " ", dtype=object)
+        for position, value in self.sparse.items():
+            array[tuple(self.pos2coords(position))] = value
+        return np.array2string(array, separator="", formatter={"all": lambda x: str(x)})
 
 
 class SquareGrid(Grid):
     def distance_fn(self, p1, p2=None):
         return abs(p1 - p2).sum()
 
+    def normalize(self):
+        mi = self.size_of_coords().min
+        return self(lambda p: self.coords2pos(*(self.pos2coords(p) - mi)))
+
     def rotate(self):
+        # degrees of rotation = 90
         return self(lambda p: Position(-p[1], p[0])).normalize()
 
-    def flip_x(self):
-        # flip_y  = rotate^2 * flip_x
-        # flip_xy = flip_x * flip_y or rotate^2
+    def flip_horizontal(self):
+        # flip_vertical  = rotate^2 * flip_horizontal
+        # flip_horizontaly = flip_horizontal * flip_vertical or rotate^2
         return self(lambda p: Position(p[0], -p[1])).normalize()
 
-    def from_text(self, text):
-        for i, row in enumerate(text.splitlines()):
-            for j, char in enumerate(row):
-                if char == self.empty:
-                    continue
-                self[Position(i, j)] = char
-        return self
+    def coords2pos(self, *coords):
+        ci, cj = coords
+        pi, pj = ci, cj
+        return Position(pi, pj)
 
-    def to_text(self):
-        text = ""
-        for i in range(*self.limits[0]):
-            for j in range(*self.limits[1]):
-                text += self.__getitem__(Position(i, j), self.empty)
-            text += "\n"
-        return text
+    def pos2coords(self, position):
+        pi, pj = position
+        ci, cj = pi, pj
+        return Position(ci, cj)
 
 
 class HexGrid(Grid):
+    __heritable__ = ("parity",)
+
+    def __init__(self, parity=None):
+        super().__init__()
+        self.parity = parity
+
     def distance_fn(self, p1, p2=None):
         return max(abs(p1 - p2).max(), abs((p1 - p2).diff2()))
+
+    def normalize(self):
+        mi = self.size_of_coords().min
+        transformed = self.__class__(parity=(self.parity + abs(mi).sum()) % 2)
+        fn = lambda p: transformed.coords2pos(*(self.pos2coords(p) - mi))
+        for position, value in self.sparse.items():
+            transformed[fn(position)] = value
+        assert transformed.area() == self.area()
+        return transformed
+
+    def rotate(self):
+        # degrees of rotation = 60
+        return self(lambda p: Position(p[0] - p[1], p[0])).normalize()
+
+    def flip_horizontal(self):
+        return self(lambda p: Position(p[0], p[0] - p[1])).normalize()
+
+    def coords2pos(self, *coords):
+        ci, cj = coords
+        if self.parity is None:
+            self.parity = (cj + ci) % 2
+        if (cj + ci) % 2 != self.parity:
+            raise ValueError(f"Invalid coords: {coords}, parity={self.parity}")
+        pi, pj = ci, (cj + ci) // 2
+        return Position(pi, pj)
+
+    def pos2coords(self, position):
+        pi, pj = position
+        ci, cj = pi, pj * 2 - pi + self.parity
+        return Position(ci, cj)
 
 
 class CubeGrid(Grid):

@@ -7,6 +7,7 @@ import numpy as np
 import yaml
 from tqdm import tqdm
 
+from .grid import Position
 from .polyform import Polyform
 
 
@@ -116,7 +117,7 @@ class Puzzle(yaml.YAMLObject):
             condition = self.state == 1
             if candidate[0, 0] == 0:
                 condition += self.state == 0
-            positions = tuple(zip(*condition.nonzero()))
+            positions = tuple(Position(*p) for p in zip(*condition.nonzero()))
             self.__print_wrapper("positions: ", positions)
 
             for position in self.__tqdm_wrapper(positions, desc="Positions"):
@@ -160,13 +161,14 @@ class Puzzle(yaml.YAMLObject):
         return self.solutions
 
     def visualize_solution(self, sid=0):
-        vis_array = np.full(self.state.shape, self.fill_value, dtype=object)
-        for pid, cid, position in self.solutions[sid]:
+        array = np.full(self.grid.size_of_coords().max + 1, self.fill_value, dtype=object)
+        for pid, cid, offset in self.solutions[sid]:
             piece = self.puzzle_pieces[pid]
             candidate = piece.candidates[cid]
-            where = tuple(pos + di for pos, di in zip(candidate.nonzero(), position))
-            vis_array[where] = piece.name
-        return vis_array
+            pos_list = ((Position(*p) + offset) for p in zip(*candidate.nonzero()))
+            coords_list = zip(*map(self.grid.pos2coords, pos_list))
+            array[tuple(coords_list)] = piece.name
+        return np.array2string(array, separator="", formatter={"all": lambda x: str(x)})
 
     def visualize_all_solutions(self):
         return {i: self.visualize_solution(i) for i, _ in enumerate(self.solutions)}
@@ -189,5 +191,5 @@ def solve_puzzle(filepath, **kwargs):
     finally:
         num = len(puzzle.solutions)
         for visualized_solution in map(puzzle.visualize_solution, range(num)):
-            pprint(visualized_solution)
+            print(visualized_solution)
         print(num, "solutions found.")

@@ -1,0 +1,29 @@
+!Puzzle
+  name: 4x9-3p-1
+  description: ウボンゴ エクストリーム
+  fill_value: "  "
+  shape: |
+    o_o_o
+    _o_o_o
+    __o_o_o_o
+    _o_o_o_o
+  puzzle_pieces:
+    - !Polyhex
+      name: " 2"
+      shape: |
+        __o_o
+        _o
+        o
+    - !Polyhex
+      name: " 8"
+      shape: |
+        o_o
+        _o
+        __o
+        _o
+    - !Polyhex
+      name: "10"
+      shape: |
+        ____o
+        ___o
+        o_o_o
